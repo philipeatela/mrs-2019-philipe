@@ -35,14 +35,14 @@ def getMostActiveAuthorsByDate(repo, dateSince='2000-01-01', dateUntil='2050-01-
 
 #type='+'-> added
 #type='-' -> removed
-def getAlteredCodeCountByText(repo, text, type='+'):
+def getAlteredCodeCountByText(repo, text, typ='+'):
   commits = list(repo.iter_commits('master'))
   lines = []
   count = 0
   for c in commits:
     for d in c.diff(git.NULL_TREE, create_patch=True, S=text):
       for line in d.diff.splitlines():
-        if(line[0] == type and text in line):
+        if(line.startswith(typ) and text in line):
           count = count + 1
 
   print (count)
