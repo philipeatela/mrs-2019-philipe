@@ -28,12 +28,26 @@ def getFileCountByCommit(repo, commit, type=None):
 
   return count
 
+#item 3
+def getFilesCountInEachCommit(repo):
+  commits = list(repo.iter_commits('master'))
+  for c in reversed(commits):
+    print c.hexsha
+    print getFileCountByCommit(repo, c)
+
+#item 4
+def getJavaFilesCountInEachCommit(repo):
+  commits = list(repo.iter_commits('master'))
+  for c in reversed(commits):
+    print c.hexsha
+    print getFileCountByCommit(repo, c, ".java")
+
 #item 5
 def getJavaLinesCountInEachCommit(repo):
   commits = list(repo.iter_commits('master'))
   for c in reversed(commits):
     print c.hexsha
-    print getJavaLinesCountByCommit(repo, c)
+    print getFileCountByCommit(repo, c, )
 
 #item 6
 def getFileCountInEachYear(repo):
@@ -74,8 +88,36 @@ def getJavaLinesCountInEachYear(repo):
 
     print year, ": ", count
 
+def getCommitNumOfFiles(repo, arg):
+  commits = list(repo.iter_commits('master'))
+  commit = commits[arg]
+  return getFileCountByCommit(commit)
+
+def getCommitNumOfJavaFiles(repo, arg):
+  commits = list(repo.iter_commits('master'))
+  commit = commits[arg]
+  return getFileCountByCommit(commit)
+
 
 repo = Repo(os.getcwd() + '/EventBus')
+
+print("-- ITEM 01 --")
+print("First commit:")
+getCommitNumOfFiles(repo, 0)
+print("Last commit:")
+getCommitNumOfFiles(repo, -1)
+
+print("-- ITEM 02 --")
+print("First commit:")
+getJavaLinesCountByCommit(repo, 0)
+print("Last commit:")
+getJavaLinesCountByCommit(repo, -1)
+
+print("-- ITEM 03 --")
+getFilesCountInEachCommit(repo)
+
+print("-- ITEM 04 --")
+getJavaFilesCountInEachCommit(repo)
 
 print("-- ITEM 05 --")
 getJavaLinesCountInEachCommit(repo)
