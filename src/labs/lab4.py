@@ -4,7 +4,7 @@ import os
 import collections
 
 
-def createGraph2(repo, test=0):
+def createGraph(repo, test=0):
   commits = list(repo.iter_commits('master'))
   if(test):
     commits = commits[-2:]
@@ -47,44 +47,11 @@ def createGraph2(repo, test=0):
 
   if(test):
     for i, f in enumerate(uniqueFiles):
-      print i, f
+      print(i, f)
     for i, v in enumerate(graph):
-      print i, v
+      print(i, v)
 
   return graph, uniqueFiles
-
-def createGraph(repo):
-  commits = list(repo.iter_commits('master'))
-  uniqueFiles = []
-  
-  for c in commits:
-    index = repo.index
-    index.reset(c)
-    files = index.checkout(force=True)
-    for f in files:
-      if (f not in uniqueFiles):
-        uniqueFiles.append(f)
-
-  numOfFiles = len(uniqueFiles)
-  graph = [[0 for x in range(numOfFiles)] for x in range(numOfFiles)]
-  
-  for c in commits:
-    repoIndex = repo.index
-    repoIndex.reset(c)
-    files = list(repoIndex.checkout(force=True))
-    for index, f in enumerate(files):
-      fileIndex = uniqueFiles.index(f)
-      for df in files[index:]:
-        dfGraphIndex = uniqueFiles.index(df)
-        graph[fileIndex][dfGraphIndex] += 1
-        graph[dfGraphIndex][fileIndex] += 1
-
-  # for i in range(numOfFiles):
-  #  for j in range(numOfFiles):
-  #    print(graph[i][j])
-
-  print('\n'.join([''.join(['{:4}'.format(item) for item in row]) 
-      for row in graph]))
 
 def getFilesMostChangedTogether(graph, files):
   #encontrar maior peso de aresta
@@ -112,30 +79,55 @@ def getFilesMostChangedTogether(graph, files):
           mostChangedFiles.append(files[vertexes[j]])
 
   for f in mostChangedFiles:
-    print f
+    print(f)
 
 def getFileWithMostNumberOfRelationships(graph, files):
   maxRelationships = 0
-  maxRelationshipsFile = ""
+  maxRelationshipsFiles = []
 
-  for i,v in enumerate(graph):
+  for v in graph:
     if (len(v) > maxRelationships):
       maxRelationships = len(v)
-      maxRelationshipsFile = files[i]
+  
+  for i,v in enumerate(graph):
+    if(len(v) == maxRelationships):
+      maxRelationshipsFiles.append(files[i])
 
-  print maxRelationships
-  print maxRelationshipsFile
+  print(maxRelationships)
+  for f in maxRelationshipsFiles:
+    print(f)
+
+def getMostImportantFiles(graph, files):
+  maxWeightSum = 0
+  maxWeightSumFiles = []
+
+  for v in graph:
+    weightSum = sum(list(v.values))
+    if(weightSum > maxWeightSum):
+      maxWeightSum = weightSum
+
+  for i,v in enumerate(graph):
+    weightSum = sum(list(v.values))
+    if(weightSum == maxWeightSum):
+      maxWeightSumFiles.append(files[i])
+
+  print(maxWeightSum)
+  for f in maxWeightSumFiles:
+    print (f)
+
 
 repo = Repo(os.getcwd() + '/EventBus')
 
-#createGraph(repo)
-graph, files = createGraph2(repo)
+graph, files = createGraph(repo)
 
 print("--- ITEM 1 ---")
 getFilesMostChangedTogether(graph, files)
 
 print("--- ITEM 2 ---")
 getFileWithMostNumberOfRelationships(graph, files)
+
+print("--- ITEM 3 ---")
+getMostImportantFiles(graph, files)
 
 
 
