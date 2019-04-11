@@ -102,12 +102,12 @@ def getMostImportantFiles(graph, files):
   maxWeightSumFiles = []
 
   for v in graph:
-    weightSum = sum(list(v.values))
+    weightSum = sum(list(v.values()))
     if(weightSum > maxWeightSum):
       maxWeightSum = weightSum
 
   for i,v in enumerate(graph):
-    weightSum = sum(list(v.values))
+    weightSum = sum(list(v.values()))
     if(weightSum == maxWeightSum):
       maxWeightSumFiles.append(files[i])
 
@@ -128,11 +128,3 @@ getFileWithMostNumberOfRelationships(graph, files)
 
 print("--- ITEM 3 ---")
 getMostImportantFiles(graph, files)
-
-
-
-
-
-
-
-    
