@@ -3,6 +3,56 @@ import git
 import os
 import collections
 
+
+def createGraph2(repo, test=0):
+  commits = list(repo.iter_commits('master'))
+  if(test):
+    commits = [commits[-1]]
+
+  uniqueFiles = []
+  graph = []
+  
+  for c in commits:
+    diff = c.diff(git.NULL_TREE)
+
+    for i, d1 in enumerate(diff):
+      f1 = d1.a_path
+
+      if (f1 not in uniqueFiles):        
+        uniqueFiles.append(f1)
+        graph.append({})
+      
+      #adicionar uma aresta entre f1 e arquivo f2 que foi alterado
+      f1Index = uniqueFiles.index(f1)
+      for d2 in diff[i+1:]:
+        f2 = d2.a_path
+
+        if (f2 not in uniqueFiles):        
+          uniqueFiles.append(f2)
+          graph.append({})
+
+        f2Index = uniqueFiles.index(f2)
+
+        #criar ou incrementar peso da aresta de f1 para f2
+        if(f2Index not in graph[f1Index]):
+          graph[f1Index][f2Index] = 1
+        else:
+          graph[f1Index][f2Index] += 1
+
+        #criar ou incrementar peso da aresta de f2 para f1
+        if(f1Index not in graph[f2Index]):
+          graph[f2Index][f1Index] = 1
+        else:
+          graph[f2Index][f1Index] += 1
+
+  if(test):
+    for i, f in enumerate(uniqueFiles):
+      print i, f
+    for i, v in enumerate(graph):
+      print i, v
+
+  return graph, uniqueFiles
+
 def createGraph(repo):
   commits = list(repo.iter_commits('master'))
   uniqueFiles = []
@@ -36,7 +86,40 @@ def createGraph(repo):
   print('\n'.join([''.join(['{:4}'.format(item) for item in row]) 
       for row in graph]))
 
+def getFilesMostChangedTogether(graph, files):
+  #encontrar maior peso de aresta
+  maxWeight = 0
+  for v in graph:
+
+    weights = list(v.values())
+    if(len(weights) > 0):
+      if(max(weights) > maxWeight):
+        maxWeigth = max(weights)
+
+  print maxWeigth
+
+  #encontrar todas as arestas com maior peso
+  #for i,v in enumerate(graph):
+    #vertexes = list(v.keys())
+    #weights = list(v.values())
+    #for j,w in enumerate(weights):
+      #if(w == maxWeigth):
+        #print(files[i])
+        #print(files[vertexes[j]])
+        #print("\n") 
+
 repo = Repo(os.getcwd() + '/EventBus')
 
-createGraph(repo)
+#createGraph(repo)
+graph, files = createGraph2(repo)
+
+print("--- ITEM 1 ---")
+getFilesMostChangedTogether(graph, files)
+
+
+
+
+
+
+
     
